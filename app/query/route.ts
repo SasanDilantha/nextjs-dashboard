@@ -1,26 +1,24 @@
-// import postgres from 'postgres';
+// app/query/route.ts
 
-// const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+import { NextResponse } from 'next/server';
+import postgres from 'postgres';
 
-// async function listInvoices() {
-// 	const data = await sql`
-//     SELECT invoices.amount, customers.name
-//     FROM invoices
-//     JOIN customers ON invoices.customer_id = customers.id
-//     WHERE invoices.amount = 666;
-//   `;
+// Initialize the connection with SSL
+const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-// 	return data;
-// }
-
+// Define the GET handler
 export async function GET() {
-  return Response.json({
-    message:
-      'Uncomment this file and remove this line. You can delete this file when you are finished.',
-  });
-  // try {
-  // 	return Response.json(await listInvoices());
-  // } catch (error) {
-  // 	return Response.json({ error }, { status: 500 });
-  // }
+  try {
+    const data = await sql`
+      SELECT invoices.amount, customers.name
+      FROM invoices
+      JOIN customers ON invoices.customer_id = customers.id
+      WHERE invoices.amount = 666;
+    `;
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Error fetching invoices:', error);
+    return NextResponse.json({ error: 'Failed to fetch invoices' }, { status: 500 });
+  }
 }
